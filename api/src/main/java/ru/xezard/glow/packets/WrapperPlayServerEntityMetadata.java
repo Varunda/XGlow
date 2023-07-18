@@ -21,10 +21,14 @@ package ru.xezard.glow.packets;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import ru.xezard.glow.data.glow.processor.GlowProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WrapperPlayServerEntityMetadata
@@ -65,6 +69,24 @@ extends AbstractPacket {
     }
 
     public void setMetadata(List<WrappedWatchableObject> value) {
-        this.handle.getWatchableCollectionModifier().write(0, value);
+        final List<WrappedDataValue> values = new ArrayList<>();
+
+        for (final WrappedWatchableObject entry : value) {
+            if (entry == null) {
+                continue;
+            }
+
+            final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+            values.add(
+                    new WrappedDataValue(
+                            watcherObject.getIndex(),
+                            watcherObject.getSerializer(),
+                            entry.getRawValue()
+                    )
+            );
+        }
+
+        this.handle.getDataValueCollectionModifier().write(0, values);
+        //this.handle.getWatchableCollectionModifier().write(0, value);
     }
 }
