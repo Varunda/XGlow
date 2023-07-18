@@ -23,10 +23,11 @@ import com.comphenix.protocol.utility.MinecraftVersion;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import ru.xezard.glow.packets.versions.WrapperPlayServerScoreboardTeam_v9_12;
 import ru.xezard.glow.packets.versions.WrapperPlayServerScoreboardTeam_v13_16;
-import ru.xezard.glow.packets.versions.WrapperPlayServerScoreboardTeam_v17_19;
+import ru.xezard.glow.packets.versions.WrapperPlayServerScoreboardTeam_v17_20;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,11 +55,12 @@ implements IWrapperPlayServerScoreboardTeam {
                 this.wrapper = new WrapperPlayServerScoreboardTeam_v9_12();
                 break;
 
+            case 20:
             case 19:
             case 18:
             case 17:
             default:
-                this.wrapper = new WrapperPlayServerScoreboardTeam_v17_19();
+                this.wrapper = new WrapperPlayServerScoreboardTeam_v17_20();
                 break;
         }
     }

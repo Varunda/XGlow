@@ -24,6 +24,9 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
@@ -32,6 +35,9 @@ import ru.xezard.glow.data.glow.manager.GlowsManager;
 import ru.xezard.glow.data.glow.processor.GlowProcessor;
 import ru.xezard.glow.listeners.EntityDeathListener;
 import ru.xezard.glow.listeners.PlayerQuitListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GlowAPI {
     private final Plugin plugin;
@@ -66,9 +72,30 @@ public class GlowAPI {
                 Entity entity = packet.getEntityModifier(event).read(0);
 
                 GlowsManager.getInstance().getGlowByEntity(entity).ifPresent((glow) -> {
+                    final List<WrappedDataValue> values = new ArrayList<>();
+
+                    for (final WrappedWatchableObject entry : GlowProcessor.getInstance().createDataWatcher(entity, glow.sees(event.getPlayer())).getWatchableObjects()) {
+                        if (entry == null) {
+                            continue;
+                        }
+
+                        final WrappedDataWatcher.WrappedDataWatcherObject watcherObject = entry.getWatcherObject();
+                        values.add(
+                                new WrappedDataValue(
+                                        watcherObject.getIndex(),
+                                        watcherObject.getSerializer(),
+                                        entry.getRawValue()
+                                )
+                        );
+                    }
+
+                    packet.getDataValueCollectionModifier().write(0, values);
+
+                    /*
                     packet.getWatchableCollectionModifier().write(0,
                             GlowProcessor.getInstance().createDataWatcher(entity, glow.sees(event.getPlayer()))
                                     .getWatchableObjects());
+                     */
 
                     event.setPacket(packet);
                 });
